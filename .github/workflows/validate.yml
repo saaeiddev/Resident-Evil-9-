@@ -1,0 +1,25 @@
+name: Validate project
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run assets
+      - run: npm run check:scene
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unverified-preview-build
+          path: dist
+          retention-days: 7
