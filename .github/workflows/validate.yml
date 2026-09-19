@@ -18,6 +18,16 @@ jobs:
       - run: npm run assets
       - run: npm run check:scene
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-validation
+          path: |
+            test-results
+            playwright-report
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: unverified-preview-build

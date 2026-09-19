@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.0.9",
+    "@playwright/test": "^1.63.0",
     "vite": "6.1.0"
   }
 }

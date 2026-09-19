@@ -3,3 +3,5 @@ dist/
 .sites-runtime/
 public/assets/models/*.glb
 public/CREDITS.md
+test-results/
+playwright-report/
