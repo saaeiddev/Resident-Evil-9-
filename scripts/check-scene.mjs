@@ -17,5 +17,6 @@ assert.equal(cast.actors.length,6);assert.equal(city.objects.length,2);
 for(let i=0;i<120;i++){const t=i/30;cast.update(1/30,t);effects.update(1/30,t);city.update(t);scene.updateMatrixWorld(true);}
 let meshes=0,triangles=0;scene.traverse(o=>{assert(o.matrixWorld.elements.every(Number.isFinite),`Invalid transform: ${o.name}`);if(o.isMesh){meshes++;const p=o.geometry.attributes.position;assert(p&&p.array.every(Number.isFinite));triangles+=(o.geometry.index?.count||p.count)/3;}});
 assert(cast.actors.every(a=>a.mixer.time>3.9));
+for(const actor of cast.actors){const bounds=new THREE.Box3().setFromObject(actor.model,true);console.log('Animated bounds',actor.infected?'infected':'hero',bounds.min.y.toFixed(2),bounds.max.y.toFixed(2));assert(bounds.max.y-bounds.min.y<3,'Animation stretches character beyond human proportions');assert(bounds.min.y>-.5&&bounds.max.y<3,'Animated character leaves ground');}
 const empty=new THREE.Scene();assert.equal(createCast(empty,{}).actors.length,0);
 console.log(JSON.stringify({models:Object.keys(assets),actors:cast.actors.length,animatedSeconds:4,meshObjects:meshes,triangles:Math.round(triangles),missingModelRecovery:'passed',finiteTransforms:'passed',note:'CPU scene validation only; not a WebGL visual or FPS test.'},null,2));

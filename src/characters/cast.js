@@ -8,7 +8,13 @@ export function createCast(scene,assets){const actors=[],objects=[];
  tracks.push(t);}return new T.AnimationClip('Idle',source.duration,tracks);
  }
  function actor(asset,x,z,height,rotation,infected=false,index=0){if(!asset)return null;const model=clone(asset.scene),pivot=new T.Group();pivot.add(model);model.updateMatrixWorld(true);const b=new T.Box3().setFromObject(model),size=b.getSize(new T.Vector3()),scale=height/size.y;model.scale.multiplyScalar(scale);model.position.set(-(b.max.x+b.min.x)/2*scale,-b.min.y*scale,-(b.max.z+b.min.z)/2*scale);pivot.position.set(x,0,z);pivot.rotation.y=rotation;scene.add(pivot);
-  model.traverse(o=>{if(!o.isMesh)return;o.castShadow=o.receiveShadow=true;o.frustumCulled=false;if(infected){o.material=o.material.clone();o.material.color.multiply(new T.Color(index%2?'#6e7772':'#777167'));o.material.roughness=.95;}});
+  model.traverse(o=>{if(!o.isMesh)return;o.castShadow=o.receiveShadow=true;o.frustumCulled=false;
+  if(asset===assets.investigator){o.material=o.material.clone();o.material.roughness=.9;o.material.metalness=0;o.material.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
+   float clothingMask=smoothstep(0.65,0.85,diffuseColor.g/max(diffuseColor.r,0.001))*smoothstep(0.06,0.18,diffuseColor.g-diffuseColor.b);
+   float clothLuma=dot(diffuseColor.rgb,vec3(0.2126,0.7152,0.0722));
+   diffuseColor.rgb=mix(diffuseColor.rgb,vec3(clothLuma*0.09,clothLuma*0.105,clothLuma*0.11),clothingMask);
+   diffuseColor.rgb=mix(vec3(dot(diffuseColor.rgb,vec3(0.2126,0.7152,0.0722))),diffuseColor.rgb,0.6);`);};o.material.customProgramCacheKey=()=> 'investigator-clothing';}
+  if(infected){o.material=o.material.clone();o.material.color.multiply(new T.Color(index%2?'#6e7772':'#777167'));o.material.roughness=.95;}});
   const mixer=new T.AnimationMixer(model);let clip=asset.animations.find(a=>/^idle$/i.test(a.name))||idleFor(model)||asset.animations[0];if(clip){clip=clip.clone();if(infected)clip.tracks=clip.tracks.filter(t=>!/(hips|root).*position/i.test(t.name));const action=mixer.clipAction(clip);action.play();action.time=index*.71;action.timeScale=infected?.28+index*.067:1;}
   mixer.update(.01);const spine=[];model.traverse(o=>{if(o.isBone&&/spine|neck|head/i.test(o.name))spine.push(o);});actors.push({pivot,model,mixer,spine,infected,index,x,z});return pivot;
  }
