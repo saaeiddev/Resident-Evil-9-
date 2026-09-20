@@ -58,6 +58,10 @@ Static geometry is merged by material; rubble and paper use instancing. Cast ins
 
 ## Screenshots and tests
 
+![Desktop scene](docs/desktop-scene.png)
+
+[Mobile scene screenshot](docs/mobile-scene.png). These are real Chromium software-WebGL captures at the adaptive Low preset; hardware GPU output can use higher quality.
+
 Actual rendered screenshots are captured as `desktop-scene.png`, `mobile-scene.png` and title counterparts in the `browser-validation` GitHub Actions artifact. The workflow also retains the browser report and traces. No static or generated picture is used in place of the 3D scene.
 
 ## Deployment

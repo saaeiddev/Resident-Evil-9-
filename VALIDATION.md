@@ -1,5 +1,11 @@
 # Validation record — 20 September 2026
 
+## Latest result
+
+Release `ae8680747e16dcb26e61fc03beacb7421d531fc2` passed all six desktop/mobile browser tests. [Build and deployment evidence](https://github.com/saaeiddev/Resident-Evil-9-/actions/runs/35493865004). Desktop interaction test: 49.8 seconds; mobile: 28.5 seconds. These are test durations, not frame rates. The separate [validation run](https://github.com/saaeiddev/Resident-Evil-9-/actions/runs/35493865002) also passed. The scene screenshots were visually inspected and saved in `docs/`.
+
+Keyboard movement, joystick movement and Leon inspection are asserted against actual changed camera state / visible information labels. A fixed 800ms keypress was replaced by waiting for observed movement because software WebGL sometimes takes longer than that to produce one frame.
+
 ## Automated checks
 
 - Production Vite build and relative GitHub Pages asset paths.
@@ -20,5 +26,7 @@ CI uses Chromium with SwiftShader software WebGL, not a hardware GPU. An iPhone 
 The downloaded cast has realistic human proportions but represents independent equivalents, not exact Leon/Grace likenesses. Infected figures reuse two base meshes with varied timing/materials. Architecture, cars and motorcycle remain original procedural geometry. This is a working fan-art experience; it does not establish the requested AAA photorealistic quality.
 
 ## Production
+
+The deployed HTML, hashed JavaScript/CSS bundles, all three GLB headers and byte lengths, and the published credit file were fetched successfully on 20 September 2026 with `node scripts/verify-production.mjs`. The production bundle hash matched the locally built release.
 
 [GitHub Pages](https://saaeiddev.github.io/Resident-Evil-9-/) serves the production build. Deployment builds now require the browser suite to pass. Actual workflow logs and screenshots are authoritative; publication success alone does not establish every physical-device requirement.
