@@ -5,11 +5,12 @@ import {material,surface,mesh,box,pipe,sign,rng} from './materials.js';
 import {motorcycle} from './motorcycle.js';
 export function environment(scene){
  const r=rng(333),staticGroup=new T.Group();scene.add(staticGroup);const objects=[],lights=[],colliders=[];
- const concrete=surface('concrete',2),brick=surface('brick',2),asphalt=surface('asphalt',12),metal=material('#303b38',.5,.7),rust=material('#4e382b',.85,.5),black=material('#090e10',.5),stone=material('#555951'),glass=material('#182525',.2,.7),line=material('#a29560',.9);
+ const concrete=surface('concrete',2),brick=surface('brick',1),asphalt=surface('asphalt',12),metal=material('#303b38',.5,.7),rust=material('#4e382b',.85,.5),black=material('#090e10',.5),stone=material('#555951'),glass=material('#182525',.2,.7),line=material('#a29560',.9);
  const road=mesh(new T.PlaneGeometry(110,150),asphalt,staticGroup,0,-.045,-35);road.rotation.x=-Math.PI/2;
  const puddle=new Reflector(new T.PlaneGeometry(13,73),{clipBias:.005,textureWidth:512,textureHeight:512,color:0x505c60});puddle.rotation.x=-Math.PI/2;puddle.position.set(0,-.025,-21);scene.add(puddle);
- // Broken islands of asphalt interrupt the reflected water.
- for(let i=0;i<145;i++){const o=mesh(new T.CircleGeometry(.25+r()*1.3,9),asphalt,staticGroup,(r()-.5)*13,-.01,r()*70-55);o.rotation.x=-Math.PI/2;o.scale.y=.3+r()*.9;}
+ // A translucent reflection layer lets the asphalt grain remain visible.
+ puddle.material.transparent=true;puddle.material.depthWrite=false;
+ puddle.material.fragmentShader=puddle.material.fragmentShader.replace('1.0 );', '0.20 );');
  for(let z=-62;z<15;z+=6){box(staticGroup,line,-.12,.004,z,.055,.008,2.6);box(staticGroup,line,.12,.004,z,.055,.008,2.6);}
  for(let side of [-1,1]){
   box(staticGroup,concrete,side*8,-.05,-29,3,.38,100);
@@ -37,7 +38,7 @@ export function environment(scene){
   }
   for(let z=5;z>-60;z-=15){pipe(staticGroup,metal,[[side*6.9,0,z],[side*6.9,5.6,z],[side*6.5,6.2,z],[side*5.2,6.2,z]],.055);
    const bulb=new T.MeshStandardMaterial({color:'#ccd8cd',emissive:'#c5dab9',emissiveIntensity:2});box(staticGroup,bulb,side*5.3,6.12,z,.6,.05,.3);
-   const l=new T.SpotLight('#b9d2c4',55,17,.8,.7,1.5);l.position.set(side*5.3,6,z);l.target.position.set(side*3,0,z-1);scene.add(l,l.target);lights.push(l);
+   if(z<0)continue;const l=new T.SpotLight('#b9d2c4',55,17,.8,.7,1.5);l.position.set(side*5.3,6,z);l.target.position.set(side*3,0,z-1);scene.add(l,l.target);lights.push(l);
   }
  }
  // Power lines and ruined skyline.
@@ -58,6 +59,6 @@ export function environment(scene){
  const notice=mesh(new T.PlaneGeometry(1.4,1.8),sign('BIOHAZARD','#bab19a','#691c1c',512),staticGroup,-5.9,1.6,-12);notice.rotation.z=-.1;notice.userData.info={title:'Containment failed',type:'FIELD NOTE / 01',copy:'The evacuation buses never arrived. The last radio transmission was at 02:17.'};objects.push(notice);
  const bike=motorcycle();scene.add(bike);objects.push(bike);
  // Merge static meshes by material. Architecture remains detailed without thousands of draw calls.
- staticGroup.updateMatrixWorld(true);const byMat=new Map();staticGroup.traverse(o=>{if(!o.isMesh||Array.isArray(o.material))return;const g=o.geometry.clone().applyMatrix4(o.matrixWorld);const a=byMat.get(o.material)||[];a.push(g);byMat.set(o.material,a);});scene.remove(staticGroup);for(const [m,gs]of byMat){const merged=mergeGeometries(gs.map(g=>g.index?g.toNonIndexed():g),false);if(merged){const o=new T.Mesh(merged,m);o.castShadow=o.receiveShadow=true;scene.add(o);}gs.forEach(g=>g.dispose());}
+ staticGroup.updateMatrixWorld(true);const byMat=new Map();staticGroup.traverse(o=>{if(!o.isMesh||Array.isArray(o.material))return;const g=o.geometry.clone().applyMatrix4(o.matrixWorld);if(o.material===brick){const p=g.attributes.position,n=g.attributes.normal,uv=g.attributes.uv;for(let i=0;i<p.count;i++)uv.setXY(i,(Math.abs(n.getX(i))>.5?p.getZ(i):p.getX(i))/1.8,p.getY(i)/1.6);}const a=byMat.get(o.material)||[];a.push(g);byMat.set(o.material,a);});scene.remove(staticGroup);for(const [m,gs]of byMat){const merged=mergeGeometries(gs.map(g=>g.index?g.toNonIndexed():g),false);if(merged){const o=new T.Mesh(merged,m);o.castShadow=o.receiveShadow=true;scene.add(o);}gs.forEach(g=>g.dispose());}
  return {objects,colliders,puddle,lights,update(t){red.intensity=7+Math.pow(Math.max(0,Math.sin(t*5)),8)*32;blue.intensity=7+Math.pow(Math.max(0,Math.sin(t*5+Math.PI)),8)*32;lights[0].intensity=45+(Math.sin(t*19)*Math.sin(t*7)> .65?-38:0);}};
 }

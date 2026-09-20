@@ -5,3 +5,6 @@ public/assets/models/*.glb
 public/CREDITS.md
 test-results/
 playwright-report/
+
+!public/assets/models/survivor.glb
+.asset-cache/

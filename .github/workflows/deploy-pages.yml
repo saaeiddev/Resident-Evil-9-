@@ -29,6 +29,12 @@ jobs:
         run: npm ci
       - name: Build site
         run: npm run build
+      - name: Validate animated scene
+        run: npm run check:scene
+      - name: Install test browser
+        run: npx playwright install --with-deps chromium
+      - name: Verify browser interactions
+        run: npx playwright test
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact

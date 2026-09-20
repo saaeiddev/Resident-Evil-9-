@@ -4,39 +4,39 @@
 
 Fan Art / Interactive Experience by Amir Saeid Dehghan
 
-## Status: implementation checkpoint — not a finished release
+[Open the live experience](https://saaeiddev.github.io/Resident-Evil-9-/) · [Asset credits](CREDITS.md) · [Validation details](VALIDATION.md)
 
-The application builds successfully. Character files decode, six animation mixers advance, geometry and transforms validate, and the browser's unsupported-WebGL fallback works. The available test browser reports `GL_VENDOR = Disabled` and cannot create a WebGL context. The rendered scene, controls, visual quality, mobile behavior and frame rates therefore remain unverified. GitHub Pages publication is intentionally held because passing browser QA was a condition of release.
+An interactive real-time Three.js survival-horror fan-art city. Explore a rain-soaked quarantine street with two survivor roles, four infected figures, a motorcycle, wrecked vehicles, abandoned storefronts and fire-lit fog.
 
-The current cast uses a Mixamo tactical character and Babylon.js HVGirl as independent stand-ins. Infected figures are altered variants of these two meshes, not four distinct zombie assets. The motorcycle and architecture are procedurally authored. These assets **do not yet meet the requested premium realistic Leon/Grace/zombie and motorcycle target**. This checkpoint must not be described as AAA or as a completed implementation of that brief.
+The characters are licensed independent equivalents. The city and motorcycle are original procedural assets. This working browser experience does not claim official character likenesses or AAA photorealism.
 
-## Implemented
+## Features
 
-- Real Three.js 3D scene with a confined ruined-city street, damaged storefronts, background skyline, rubble, paper, road barriers and abandoned vehicles.
-- PBR materials, procedural surface detail, planar wet-road reflection, cool skylight, warm fires, emergency lights, fog, rain and smoke.
-- Six skeletal character instances with AnimationMixer playback, desynchronized infected movement and role labels.
-- Cinematic introduction with skip/replay, WASD/arrow movement, Shift movement speed, mouse drag, optional pointer lock, collision regions and a touch joystick.
-- Ultra/High/Medium/Low presets and automatic quality reduction.
-- Opt-in original synthesized ambience, footsteps, credits and fan-art disclaimer.
-- Actual completed-model loading progress; fetch and decode timeouts; partial-model recovery; boot timeout; WebGL/context-loss fallback.
+- Cinematic introduction, skip/replay, first-person movement and object inspection.
+- Three optimized skinned GLB assets, six AnimationMixers, retargeted idle and asynchronous infected motion.
+- PBR materials, fog, rain, smoke, fire, emergency lights and optional wet-road reflections.
+- Four graphics presets and automatic downshift based on measured wall-clock frame rate.
+- Touch joystick and drag camera, opt-in synthesized audio, credits and fan-art disclaimer.
+- Actual loading progress, fetch/decode timeouts, missing-model recovery, boot timeout and WebGL/context-loss fallback.
 
-## Run locally
+## Development
 
-Requires Node.js 22 or newer.
+Node.js 22 or newer:
 
 ```sh
 npm ci
-npm run assets
 npm run dev
 ```
 
 ```sh
-npm run check:scene
 npm run build
+npm run check:scene
+npx playwright install chromium
+npx playwright test
 npm run preview
 ```
 
-Models are downloaded once from pinned source revisions and SHA-256 checked. Runtime model URLs are local and relative. The application does not depend on model-library hotlinks. The `dist/` folder is the production output. Vite's relative base supports GitHub Pages project paths and refreshes at the root route.
+The build fetches pinned, SHA-256-verified asset sources, resizes textures to 1024px, converts them to WebP and compresses geometry with Meshopt. The CC BY survivor GLB is included; Mixamo source files are fetched only for incorporation into the build. Runtime assets are local, not remote hotlinks. Three shipped GLBs total about 2.3 MB.
 
 ## Controls
 
@@ -44,28 +44,25 @@ Models are downloaded once from pinned source revisions and SHA-256 checked. Run
 | --- | --- |
 | WASD / arrows | Move |
 | Shift | Move faster |
-| Drag / touch drag | Look |
+| Mouse drag / touch drag | Look |
 | Mouse look button | Capture mouse |
 | Escape | Release mouse / close dialog |
-| Click / tap a character or narrative sign | Inspect |
-| Touch joystick | Move on touchscreens |
+| Click / tap character or narrative sign | Inspect |
+| Touch joystick | Move |
 
 ## Performance
 
-Static city geometry is merged by material; rubble and paper are instanced. Characters reuse source geometries and textures. Quality settings reduce pixel ratio, postprocessing, particles, shadows and reflections. Only one directional light casts shadows. No FPS guarantee has been measured. The target remains 50–60 FPS on capable desktops and 30+ FPS on mid-range hardware, pending testing on actual devices.
+Static geometry is merged by material; rubble and paper use instancing. Cast instances share source geometry/textures. Quality presets reduce pixel ratio, particles, postprocessing, shadows and reflection. Medium is the conservative default. Only the moon casts shadows; distant street fixtures are emissive rather than dynamic lights. FPS adaptation uses elapsed real time independently of the animation step limit.
 
-## Screenshots
+50–60 FPS desktop and 30+ FPS mobile remain hardware-dependent targets, not measured guarantees. CI renders with software WebGL. Physical Safari/iPhone/Android/tablet testing is still required for a full device certification.
 
-No rendered screenshot is included: the available browser could not initialize WebGL. A screenshot must be captured from the actual scene after visual QA; no generated image is being presented as a working scene.
+## Screenshots and tests
 
-## Release requirements
+Actual rendered screenshots are captured as `desktop-scene.png`, `mobile-scene.png` and title counterparts in the `browser-validation` GitHub Actions artifact. The workflow also retains the browser report and traces. No static or generated picture is used in place of the 3D scene.
 
-1. Replace the current cast and motorcycle with licensed assets that satisfy the realistic visual brief.
-2. Inspect the scene on WebGL-capable desktop and mobile browsers, fix any visual or runtime defects, and capture real screenshots.
-3. Verify character animation, interactions, sound, loading failure recovery, touch navigation and measured performance.
-4. Publish the verified `dist/` output to GitHub Pages and verify that production URL.
+## Deployment
 
-See [credits](CREDITS.md) and [validation record](VALIDATION.md).
+GitHub Actions builds and tests the production bundle, then publishes `dist/` to GitHub Pages. Vite uses a relative base so models and code work under `/Resident-Evil-9-/`. Refreshing the root URL works without a client-side router.
 
 ## Disclaimer
 
